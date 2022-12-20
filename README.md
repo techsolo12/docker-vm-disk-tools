@@ -20,7 +20,8 @@ Clone-vm-disk is also a semi-automated script, which clone a existing vm-disk to
 Normally the [SDID] and [TDID] are identical. Only if you had more the one disk on source container.
 Normally also the [SPOOL] and [TPOLL] are indentical. It's can be different, if you want to clone a vm-disk from a "old" pool to a "new" pool.
 
-1. Copy script to your local machine ```nano clone-vm-disk.sh```
-2. Make executeable ```chmod +x clone-vm-disk.sh```
-3. Edit your Source ContainerID [SCID], the Target ContainerID [TCID], the source disk number [SDID], the target disk number [TDID], your source ZFS poolname [SPOOL], your target ZFS poolname [TPOOL] and the needed filesystem [FS].
-4. Follow instructions after script execution
+1. At first you have to clone the LXC with docker installation.
+2. Copy script to your local machine ```nano clone-vm-disk.sh```
+3. Make executeable ```chmod +x clone-vm-disk.sh```
+4. Edit your Source ContainerID [SCID], the Target ContainerID [TCID], the source disk number [SDID], the target disk number [TDID], your source ZFS poolname [SPOOL], your target ZFS poolname [TPOOL] and the needed filesystem [FS].
+5. Follow instructions after script execution
