@@ -1,0 +1,63 @@
+#!/bin/sh
+
+# Container ID
+CID="208"
+
+# Disk number for !!!new!!! vm disk
+DID="1"
+
+# Disk number for !!!old!!! disk
+ODID="3"
+
+# Color CYAN for echo
+CYAN='\033[0;36m'
+
+# No Color echo
+NC='\033[0m'
+
+# Shutdown lxc
+pct stop "$CID"
+sleep 1
+
+# Create a new vm disk
+zfs create -s -V 8G rpool/data/vm-"$CID"-disk-"$DID"
+sleep 1
+echo "VM disk are created"
+
+# Make a filsystem on it = ext4
+mkfs.ext4 /dev/zvol/rpool/data/vm-"$CID"-disk-"$DID"
+sleep 3
+
+# Create a new tmp directory for the disk
+mkdir /tmp/docker-ext4-"$CID"
+sleep 1
+echo "TMP directory for mounting are created"
+
+# Mount disk on /tmp/docker-ext4-"$CID"
+mount /dev/zvol/rpool/data/vm-"$CID"-disk-"$DID" /tmp/docker-ext4-"$CID"/
+sleep 1
+echo "New VM disk are mounted"
+
+# Set the correct ownership
+chown -R 100000:100000 /tmp/docker-ext4-"$CID"
+sleep 1
+echo "Ownership for mounted vm disk are set"
+
+# Rsync the the docker stuff from !old! disk to new !vm-disk!
+rsync -a -h --stats /rpool/data/subvol-"$CID"-disk-"$ODID"/* /tmp/docker-ext4-"$CID"/
+
+# Unmount the new disk
+umount /tmp/docker-ext4-"$CID"
+sleep 1
+echo "New VM disk now unmounted on host"
+
+# Rescan disk for lxc
+pct rescan
+
+# remove the now unused /tmp/docker-ext4-"$CID"
+rm -rf /tmp/docker-ext4-"$CID"
+echo "TMP directory are deleted"
+
+echo "Rescan and copy process are complete."
+echo "Check the ${CYAN}LXC$CID ${NC}and ${CYAN}remove${NC} the old ${CYAN}subvol-$CID-disk-$ODID. ${NC}After this ${CYAN}edit vm-$CID-disk-$DID ${NC}on LXC$CID"
+echo "Please mount ${CYAN}vm-$CID-disk-$DID to path /var/lib/docker${NC}"
